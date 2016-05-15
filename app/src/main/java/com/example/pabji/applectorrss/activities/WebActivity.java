@@ -6,24 +6,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.pabji.applectorrss.R;
-import com.example.pabji.applectorrss.fragments.DetailFragment;
-import com.example.pabji.applectorrss.fragments.ItemListFragment;
-import com.example.pabji.applectorrss.models.Item;
+import com.example.pabji.applectorrss.fragments.WebFragment;
 
-public class DetailActivity extends AppCompatActivity {
+public class WebActivity extends AppCompatActivity {
 
-    private Item item;
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-        Intent intent = getIntent();
-        item = intent.getParcelableExtra("item");
+        setContentView(R.layout.activity_web);
 
-        DetailFragment detailFragment = DetailFragment.newInstance(item);
+        Intent intent = getIntent();
+        url = intent.getStringExtra("url");
+
+        WebFragment webFragment = WebFragment.newInstance(url);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_detail,detailFragment)
+                .replace(R.id.content_web,webFragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }

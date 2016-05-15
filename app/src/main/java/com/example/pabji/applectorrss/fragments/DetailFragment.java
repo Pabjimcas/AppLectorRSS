@@ -1,8 +1,10 @@
 package com.example.pabji.applectorrss.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.pabji.applectorrss.R;
+import com.example.pabji.applectorrss.activities.DetailActivity;
+import com.example.pabji.applectorrss.activities.WebActivity;
 import com.example.pabji.applectorrss.models.Item;
 import com.squareup.picasso.Picasso;
 
@@ -59,7 +63,11 @@ public class DetailFragment extends Fragment {
             buttonBrowser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO
+                    Log.d("TAG",item.getLink());
+                    Intent intent = new Intent();
+                    intent.setClass(getActivity(), WebActivity.class);
+                    intent.putExtra("url",item.getLink());
+                    startActivity(intent);
                 }
             });
         }
