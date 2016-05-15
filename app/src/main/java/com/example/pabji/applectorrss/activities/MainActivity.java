@@ -1,13 +1,18 @@
 package com.example.pabji.applectorrss.activities;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.example.pabji.applectorrss.R;
 import com.example.pabji.applectorrss.fragments.ItemListFragment;
@@ -42,6 +47,19 @@ public class MainActivity extends AppCompatActivity {
         RSSSQLiteHelper rssHelper = new RSSSQLiteHelper(this, RSSSQLiteHelper.DATABASE_NAME,
                 null, RSSSQLiteHelper.DATABASE_VERSION);
         db = rssHelper.getWritableDatabase();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(getApplicationContext(), PreferencesActivity.class);
+        startActivity(intent);
+        return true;
     }
 
     public void saveItemDB(Item item){

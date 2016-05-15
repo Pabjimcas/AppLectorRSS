@@ -1,6 +1,8 @@
 package com.example.pabji.applectorrss.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
@@ -14,6 +16,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,10 +31,12 @@ import com.example.pabji.applectorrss.activities.DetailActivity;
 import com.example.pabji.applectorrss.activities.MainActivity;
 import com.example.pabji.applectorrss.adapters.ItemListAdapter;
 import com.example.pabji.applectorrss.models.Item;
+import com.example.pabji.applectorrss.persistence.PreferencesManager;
 import com.example.pabji.applectorrss.persistence.RSSSQLiteHelper;
 import com.example.pabji.applectorrss.utils.Connectivity;
 import com.example.pabji.applectorrss.utils.Filter;
 import com.example.pabji.applectorrss.utils.ParseRSS;
+import com.example.pabji.applectorrss.utils.UrlType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +55,13 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
 
     private MenuItem myActionMenuItem;
     private SearchView searchView;
-    private static final String URL = "http://elpais.com/rss/tags/andalucia_a.xml";
+    private SharedPreferences sharedPreferences;
     private List<Item> itemList;
     private ItemListAdapter adapter;
+    private boolean mDualPane;
+    int currentPosition;
+    private String URL;
+    private Integer urlPreference;
 
     public static ItemListFragment newInstance() {
         ItemListFragment fragment = new ItemListFragment();
@@ -64,7 +73,17 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        sharedPreferences =  getActivity().getSharedPreferences("Preferences", Context.MODE_PRIVATE);
+        int index = sharedPreferences.getInt("url",0);
+        URL = getUrl(index);
+        //URL = "http://elpais.com/rss/tags/andalucia_a.xml";
         return inflater.inflate(R.layout.fragment_item_list, container, false);
+    }
+
+
+    public String getUrl(int index){
+        String[] urls = getResources().getStringArray(R.array.urls);
+        return urls[index];
     }
 
     @Override
@@ -77,14 +96,52 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d("TAG","OnActivityCreated");
         if(getView()!=null){
-            recyclerViewInit();
-            if(Connectivity.isNetworkAvailable(getContext())) {
-                new RSSAsyncTask().execute(URL);
+            if(savedInstanceState != null){
+                currentPosition = savedInstanceState.getInt("currentPosition");
+                Log.d("TAG",String.valueOf(currentPosition));
             }else{
-                itemList = ((MainActivity)getActivity()).loadItemsDB();
-                loadItemsInRecyclerView();
+                Log.d("TAG","Entro");
+                recyclerViewInit();
+                if(Connectivity.isNetworkAvailable(getContext())) {
+                    new RSSAsyncTask().execute(URL);
+                }else{
+                    itemList = ((MainActivity)getActivity()).loadItemsDB();
+                    loadItemsInRecyclerView();
+                }
             }
+            View detailsFrame = getActivity().findViewById(R.id.content_detail);
+            mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+            if (mDualPane) {
+                showDetail(currentPosition);
+            }
+
+        }
+    }
+
+    private void showDetail(int position) {
+        currentPosition = position;
+
+        Item item = new Item();
+        if (itemList != null) {
+            item = itemList.get(position);
+            ((MainActivity)getActivity()).saveItemDB(item);
+        }
+
+        if (mDualPane) {
+
+            DetailFragment detailFragment = DetailFragment.newInstance(item);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.content_detail, detailFragment);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.commit();
+
+        } else {
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), DetailActivity.class);
+            intent.putExtra("item", item);
+            startActivity(intent);
         }
     }
 
@@ -135,6 +192,9 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
             if(items != null){
                 setLoading(false);
                 itemList = items;
+                if(mDualPane){
+                    showDetail(0);
+                }
                 loadItemsInRecyclerView();
             }
         }
@@ -145,12 +205,7 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Item item = itemList.get(recyclerView.getChildAdapterPosition(v));
-                ((MainActivity)getActivity()).saveItemDB(item);
-                Intent intent = new Intent();
-                intent.setClass(getActivity(), DetailActivity.class);
-                intent.putExtra("item",item);
-                startActivity(intent);
+                showDetail(recyclerView.getChildAdapterPosition(v));
             }
         });
         recyclerView.setAdapter(adapter);
@@ -177,5 +232,11 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
             }
         });
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("currentPosition",currentPosition);
     }
 }

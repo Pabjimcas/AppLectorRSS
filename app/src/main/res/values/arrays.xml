@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="listArray">
+        <item>Andalucía</item>
+        <item>Madrid</item>
+        <item>Cataluña</item>
+        <item>Comunidad Valenciana</item>
+        <item>Pais Vasco</item>
+        <item>Galicia</item>
+    </string-array>
+    <string-array name="listValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="urls">
+        <item>http://ep00.epimg.net/rss/ccaa/andalucia.xml</item>
+        <item>http://ep00.epimg.net/rss/ccaa/madrid.xml</item>
+        <item>http://ep00.epimg.net/rss/ccaa/catalunya.xml</item>
+        <item>http://ep00.epimg.net/rss/ccaa/valencia.xml</item>
+        <item>http://ep00.epimg.net/rss/ccaa/paisvasco.xml</item>
+        <item>http://ep00.epimg.net/rss/ccaa/galicia.xml</item>
+    </string-array>
+</resources>

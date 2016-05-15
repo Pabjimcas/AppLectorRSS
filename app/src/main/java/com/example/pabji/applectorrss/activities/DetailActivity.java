@@ -2,10 +2,12 @@ package com.example.pabji.applectorrss.activities;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.pabji.applectorrss.R;
 import com.example.pabji.applectorrss.fragments.DetailFragment;
@@ -20,11 +22,19 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("TAG","Detail");
         super.onCreate(savedInstanceState);
+        if (getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) {
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_detail);
-        Intent intent = getIntent();
-        item = intent.getParcelableExtra("item");
-        loadFragment();
+        if (savedInstanceState == null) {
+            Intent intent = getIntent();
+            item = intent.getParcelableExtra("item");
+            loadFragment();
+        }
     }
 
     private void loadFragment() {

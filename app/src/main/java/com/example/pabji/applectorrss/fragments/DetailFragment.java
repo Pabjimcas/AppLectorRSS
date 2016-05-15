@@ -1,9 +1,11 @@
 package com.example.pabji.applectorrss.fragments;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +16,10 @@ import android.widget.TextView;
 
 import com.example.pabji.applectorrss.R;
 import com.example.pabji.applectorrss.activities.DetailActivity;
+import com.example.pabji.applectorrss.activities.MainActivity;
 import com.example.pabji.applectorrss.activities.WebActivity;
 import com.example.pabji.applectorrss.models.Item;
+import com.example.pabji.applectorrss.utils.Connectivity;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -68,13 +72,28 @@ public class DetailFragment extends Fragment {
             buttonBrowser.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("TAG",item.getLink());
-                    Intent intent = new Intent();
-                    intent.setClass(getActivity(), WebActivity.class);
-                    intent.putExtra("url",item.getLink());
-                    startActivity(intent);
+                    showWeb();
                 }
             });
         }
     }
+
+
+    private void showWeb() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            WebFragment webFragment = WebFragment.newInstance(item.getLink());
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.content_detail, webFragment);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.commit();
+        }else{
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), WebActivity.class);
+            intent.putExtra("url",item.getLink());
+            startActivity(intent);
+        }
+
+
+    }
+
 }
