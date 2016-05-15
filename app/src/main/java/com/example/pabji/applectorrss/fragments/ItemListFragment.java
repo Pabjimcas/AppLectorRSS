@@ -8,12 +8,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -25,14 +30,16 @@ import com.example.pabji.applectorrss.adapters.ItemListAdapter;
 import com.example.pabji.applectorrss.models.Item;
 import com.example.pabji.applectorrss.persistence.RSSSQLiteHelper;
 import com.example.pabji.applectorrss.utils.Connectivity;
+import com.example.pabji.applectorrss.utils.Filter;
 import com.example.pabji.applectorrss.utils.ParseRSS;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ItemListFragment extends Fragment {
+public class ItemListFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -41,8 +48,11 @@ public class ItemListFragment extends Fragment {
     ProgressBar progressBar;
 
 
-
+    private MenuItem myActionMenuItem;
+    private SearchView searchView;
     private static final String URL = "http://elpais.com/rss/tags/andalucia_a.xml";
+    private List<Item> itemList;
+    private ItemListAdapter adapter;
 
     public static ItemListFragment newInstance() {
         ItemListFragment fragment = new ItemListFragment();
@@ -61,6 +71,7 @@ public class ItemListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -71,8 +82,8 @@ public class ItemListFragment extends Fragment {
             if(Connectivity.isNetworkAvailable(getContext())) {
                 new RSSAsyncTask().execute(URL);
             }else{
-                List<Item> itemList = ((MainActivity)getActivity()).loadItemsDB();
-                loadItemsInRecyclerView(itemList);
+                itemList = ((MainActivity)getActivity()).loadItemsDB();
+                loadItemsInRecyclerView();
             }
         }
     }
@@ -90,6 +101,20 @@ public class ItemListFragment extends Fragment {
             progressBar.setVisibility(View.GONE);
         }
     }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        final List<Item> filteredModelList = Filter.filter(itemList, newText);
+        adapter.setFilter(filteredModelList);
+        return false;
+    }
+
+
 
     private class RSSAsyncTask extends AsyncTask<String, Void, List<Item>> {
 
@@ -109,17 +134,18 @@ public class ItemListFragment extends Fragment {
 
             if(items != null){
                 setLoading(false);
-                loadItemsInRecyclerView(items);
+                itemList = items;
+                loadItemsInRecyclerView();
             }
         }
     }
 
-    private void loadItemsInRecyclerView(final List<Item> items) {
-        final ItemListAdapter adapter = new ItemListAdapter(getActivity(), items);
+    private void loadItemsInRecyclerView() {
+        adapter = new ItemListAdapter(getActivity(), itemList);
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Item item = items.get(recyclerView.getChildAdapterPosition(v));
+                Item item = itemList.get(recyclerView.getChildAdapterPosition(v));
                 ((MainActivity)getActivity()).saveItemDB(item);
                 Intent intent = new Intent();
                 intent.setClass(getActivity(), DetailActivity.class);
@@ -128,5 +154,28 @@ public class ItemListFragment extends Fragment {
             }
         });
         recyclerView.setAdapter(adapter);
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.menu_search, menu);
+
+        myActionMenuItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) myActionMenuItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+
+        MenuItemCompat.setOnActionExpandListener(myActionMenuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                return true;
+            }
+        });
+
     }
 }

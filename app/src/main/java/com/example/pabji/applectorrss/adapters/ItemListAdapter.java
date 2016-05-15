@@ -10,12 +10,13 @@ import com.example.pabji.applectorrss.R;
 import com.example.pabji.applectorrss.holders.ItemListHolder;
 import com.example.pabji.applectorrss.models.Item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemListAdapter extends RecyclerView.Adapter<ItemListHolder> implements View.OnClickListener {
 
-    private final List<Item> listItem;
-    private final Context mContext;
+    private List<Item> listItem;
+    private Context mContext;
     private View.OnClickListener listener;
 
     public ItemListAdapter(Context context, List<Item> items) {
@@ -48,5 +49,11 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListHolder> implem
     public void onClick(View view) {
         if(listener != null)
             listener.onClick(view);
+    }
+
+    public void setFilter(List<Item> objects){
+        listItem = new ArrayList<>();
+        listItem.addAll(objects);
+        notifyDataSetChanged();
     }
 }
