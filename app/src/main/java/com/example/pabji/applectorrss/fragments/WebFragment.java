@@ -42,7 +42,6 @@ public class WebFragment  extends Fragment {
 
         if (getArguments() != null) {
             url = (String) getArguments().get("url");
-            Log.d("TAG",url);
         }
         setWeb(url);
         super.onViewCreated(view, savedInstanceState);

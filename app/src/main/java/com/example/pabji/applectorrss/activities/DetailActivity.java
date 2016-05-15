@@ -17,15 +17,15 @@ import com.example.pabji.applectorrss.persistence.RSSSQLiteHelper;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private SQLiteDatabase db;
     private Item item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("TAG","Detail");
         super.onCreate(savedInstanceState);
+        //Comprobar si el dispositivo está en landscape para cargar dos fragments en MainActivity y finalizar esta actividad
         if (getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) {
+
             finish();
             return;
         }
@@ -38,6 +38,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadFragment() {
+        //Cargar Fragment
         DetailFragment detailFragment = DetailFragment.newInstance(item);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_detail,detailFragment)

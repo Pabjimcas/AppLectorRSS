@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.pabji.applectorrss.R;
-import com.example.pabji.applectorrss.activities.DetailActivity;
-import com.example.pabji.applectorrss.activities.MainActivity;
 import com.example.pabji.applectorrss.activities.WebActivity;
 import com.example.pabji.applectorrss.models.Item;
-import com.example.pabji.applectorrss.utils.Connectivity;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -62,9 +58,9 @@ public class DetailFragment extends Fragment {
         ButterKnife.bind(this, view);
         if(getView()!=null) {
             if (!item.getImageUrl().equals("")) {
-                Picasso.with(getContext()).load(item.getImageUrl()).into(imageDetail);
+                Picasso.with(getContext()).load(item.getImageUrl()).fit().centerCrop().into(imageDetail);
             }else{
-                Picasso.with(getContext()).load(R.mipmap.ic_launcher).into(imageDetail);
+                Picasso.with(getContext()).load(R.mipmap.ic_launcher).fit().centerCrop().into(imageDetail);
             }
 
             titleDetail.setText(item.getTitle());

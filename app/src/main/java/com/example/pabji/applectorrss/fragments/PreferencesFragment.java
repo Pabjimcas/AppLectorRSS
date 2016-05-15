@@ -7,16 +7,12 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import com.example.pabji.applectorrss.R;
-import com.example.pabji.applectorrss.persistence.PreferencesManager;
 
 @SuppressLint("ValidFragment")
 public class PreferencesFragment extends PreferenceFragment {
 
-    private String sourceUrl;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -25,7 +21,7 @@ public class PreferencesFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.preferences);
 
         final ListPreference listPreference = (ListPreference) findPreference("sourceUrl");
-        listPreference.setValueIndex(PreferencesManager.getInstance(getActivity()).urlPreference);
+        listPreference.setValueIndex(0);
         listPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {

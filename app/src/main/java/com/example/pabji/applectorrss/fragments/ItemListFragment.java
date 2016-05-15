@@ -3,21 +3,16 @@ package com.example.pabji.applectorrss.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,14 +26,10 @@ import com.example.pabji.applectorrss.activities.DetailActivity;
 import com.example.pabji.applectorrss.activities.MainActivity;
 import com.example.pabji.applectorrss.adapters.ItemListAdapter;
 import com.example.pabji.applectorrss.models.Item;
-import com.example.pabji.applectorrss.persistence.PreferencesManager;
-import com.example.pabji.applectorrss.persistence.RSSSQLiteHelper;
 import com.example.pabji.applectorrss.utils.Connectivity;
 import com.example.pabji.applectorrss.utils.Filter;
 import com.example.pabji.applectorrss.utils.ParseRSS;
-import com.example.pabji.applectorrss.utils.UrlType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -76,7 +67,6 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
         sharedPreferences =  getActivity().getSharedPreferences("Preferences", Context.MODE_PRIVATE);
         int index = sharedPreferences.getInt("url",0);
         URL = getUrl(index);
-        //URL = "http://elpais.com/rss/tags/andalucia_a.xml";
         return inflater.inflate(R.layout.fragment_item_list, container, false);
     }
 
@@ -96,20 +86,17 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d("TAG","OnActivityCreated");
         if(getView()!=null){
             if(savedInstanceState != null){
                 currentPosition = savedInstanceState.getInt("currentPosition");
-                Log.d("TAG",String.valueOf(currentPosition));
             }else{
-                Log.d("TAG","Entro");
                 recyclerViewInit();
-                if(Connectivity.isNetworkAvailable(getContext())) {
+                //if(Connectivity.isNetworkAvailable(getContext())) {
                     new RSSAsyncTask().execute(URL);
-                }else{
+                /*}else{
                     itemList = ((MainActivity)getActivity()).loadItemsDB();
                     loadItemsInRecyclerView();
-                }
+                }*/
             }
             View detailsFrame = getActivity().findViewById(R.id.content_detail);
             mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
@@ -126,7 +113,7 @@ public class ItemListFragment extends Fragment implements SearchView.OnQueryText
         Item item = new Item();
         if (itemList != null) {
             item = itemList.get(position);
-            ((MainActivity)getActivity()).saveItemDB(item);
+            //((MainActivity)getActivity()).saveItemDB(item);
         }
 
         if (mDualPane) {
