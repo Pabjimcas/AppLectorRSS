@@ -1,10 +1,14 @@
 package com.example.pabji.applectorrss.fragments;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,8 +20,11 @@ import android.widget.ProgressBar;
 
 import com.example.pabji.applectorrss.R;
 import com.example.pabji.applectorrss.activities.DetailActivity;
+import com.example.pabji.applectorrss.activities.MainActivity;
 import com.example.pabji.applectorrss.adapters.ItemListAdapter;
 import com.example.pabji.applectorrss.models.Item;
+import com.example.pabji.applectorrss.persistence.RSSSQLiteHelper;
+import com.example.pabji.applectorrss.utils.Connectivity;
 import com.example.pabji.applectorrss.utils.ParseRSS;
 
 import java.util.List;
@@ -32,6 +39,8 @@ public class ItemListFragment extends Fragment {
 
     @Bind(R.id.progress_bar)
     ProgressBar progressBar;
+
+
 
     private static final String URL = "http://elpais.com/rss/tags/andalucia_a.xml";
 
@@ -59,7 +68,12 @@ public class ItemListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if(getView()!=null){
             recyclerViewInit();
-            new RSSAsyncTask().execute(URL);
+            if(Connectivity.isNetworkAvailable(getContext())) {
+                new RSSAsyncTask().execute(URL);
+            }else{
+                List<Item> itemList = ((MainActivity)getActivity()).loadItemsDB();
+                loadItemsInRecyclerView(itemList);
+            }
         }
     }
 
@@ -95,18 +109,24 @@ public class ItemListFragment extends Fragment {
 
             if(items != null){
                 setLoading(false);
-                final ItemListAdapter adapter = new ItemListAdapter(getActivity(), items);
-                adapter.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent();
-                        intent.setClass(getActivity(), DetailActivity.class);
-                        intent.putExtra("item",items.get(recyclerView.getChildAdapterPosition(v)));
-                        startActivity(intent);
-                    }
-                });
-                recyclerView.setAdapter(adapter);
+                loadItemsInRecyclerView(items);
             }
         }
+    }
+
+    private void loadItemsInRecyclerView(final List<Item> items) {
+        final ItemListAdapter adapter = new ItemListAdapter(getActivity(), items);
+        adapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Item item = items.get(recyclerView.getChildAdapterPosition(v));
+                ((MainActivity)getActivity()).saveItemDB(item);
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), DetailActivity.class);
+                intent.putExtra("item",item);
+                startActivity(intent);
+            }
+        });
+        recyclerView.setAdapter(adapter);
     }
 }

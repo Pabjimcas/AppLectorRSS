@@ -28,7 +28,7 @@ public class ItemListHolder extends RecyclerView.ViewHolder {
     public void bindItem(Item item) {
         titleItem.setText(item.getTitle());
         descriptionItem.setText(item.getDescription());
-        if (item.getImageUrl() != null) {
+        if (item.getImageUrl() != "") {
             Picasso.with(mContext).load(item.getImageUrl()).fit().centerCrop().into(imageItem);
         }else{
             Picasso.with(mContext).load(R.mipmap.ic_launcher).into(imageItem);

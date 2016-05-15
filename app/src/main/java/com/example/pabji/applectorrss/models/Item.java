@@ -37,7 +37,7 @@ public class Item implements Parcelable {
     }
 
     public void setDescription(String description) {
-        this.description = description.trim();
+        this.description = description;
     }
 
     public String getImageUrl() {
@@ -56,7 +56,11 @@ public class Item implements Parcelable {
         this.content = content.trim();
     }
 
-    public Date getPubDate() {
+    public String getPubDate(){
+        return pubDate;
+    }
+
+    public Date getFormatedDate() {
         DateFormat dateFormat = new SimpleDateFormat();
         Date date = new Date();
         try {
@@ -87,7 +91,12 @@ public class Item implements Parcelable {
     }
 
     public Item (){
-
+        title = "";
+        link = "";
+        description = "";
+        content = "";
+        imageUrl = "";
+        pubDate = "";
     }
 
     protected Item(Parcel in) {

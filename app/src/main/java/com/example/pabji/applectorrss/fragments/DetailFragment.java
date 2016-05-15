@@ -57,7 +57,12 @@ public class DetailFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
         if(getView()!=null) {
-            Picasso.with(getContext()).load(item.getImageUrl()).into(imageDetail);
+            if (!item.getImageUrl().equals("")) {
+                Picasso.with(getContext()).load(item.getImageUrl()).into(imageDetail);
+            }else{
+                Picasso.with(getContext()).load(R.mipmap.ic_launcher).into(imageDetail);
+            }
+
             titleDetail.setText(item.getTitle());
             descriptionDetail.setText(item.getDescription());
             buttonBrowser.setOnClickListener(new View.OnClickListener() {
