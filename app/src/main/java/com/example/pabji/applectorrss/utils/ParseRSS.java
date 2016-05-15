@@ -80,12 +80,7 @@ public class ParseRSS {
                 new EndTextElementListener() {
                     @Override
                     public void end(String body) {
-                        DateFormat date = new SimpleDateFormat();
-                        try {
-                            currentItem.setPubDate(date.parse(body));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                        currentItem.setPubDate(body);
                     }
                 }
         );

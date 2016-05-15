@@ -1,5 +1,6 @@
 package com.example.pabji.applectorrss.fragments;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,12 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.pabji.applectorrss.R;
+import com.example.pabji.applectorrss.activities.DetailActivity;
 import com.example.pabji.applectorrss.adapters.ItemListAdapter;
 import com.example.pabji.applectorrss.models.Item;
 import com.example.pabji.applectorrss.utils.ParseRSS;
@@ -88,14 +91,22 @@ public class ItemListFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<Item> items) {
+        protected void onPostExecute(final List<Item> items) {
 
             if(items != null){
                 setLoading(false);
                 final ItemListAdapter adapter = new ItemListAdapter(getActivity(), items);
+                adapter.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent();
+                        intent.setClass(getActivity(), DetailActivity.class);
+                        intent.putExtra("item",items.get(recyclerView.getChildAdapterPosition(v)));
+                        startActivity(intent);
+                    }
+                });
                 recyclerView.setAdapter(adapter);
             }
-            
         }
     }
 }
