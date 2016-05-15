@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.pabji.applectorrss.R;
+import com.example.pabji.applectorrss.adapters.ItemListAdapter;
 import com.example.pabji.applectorrss.models.Item;
 import com.example.pabji.applectorrss.utils.ParseRSS;
 
@@ -91,9 +92,10 @@ public class ItemListFragment extends Fragment {
 
             if(items != null){
                 setLoading(false);
+                final ItemListAdapter adapter = new ItemListAdapter(getActivity(), items);
+                recyclerView.setAdapter(adapter);
             }
-
-
+            
         }
     }
 }
