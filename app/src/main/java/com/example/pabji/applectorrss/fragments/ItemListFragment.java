@@ -1,5 +1,6 @@
 package com.example.pabji.applectorrss.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,10 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.pabji.applectorrss.R;
+import com.example.pabji.applectorrss.models.Item;
+import com.example.pabji.applectorrss.utils.ParseRSS;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,6 +28,8 @@ public class ItemListFragment extends Fragment {
 
     @Bind(R.id.progress_bar)
     ProgressBar progressBar;
+
+    private static final String URL = "http://elpais.com/rss/tags/andalucia_a.xml";
 
     public static ItemListFragment newInstance() {
         ItemListFragment fragment = new ItemListFragment();
@@ -48,6 +55,7 @@ public class ItemListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if(getView()!=null){
             recyclerViewInit();
+            new RSSAsyncTask().execute(URL);
         }
     }
 
@@ -55,5 +63,37 @@ public class ItemListFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    private void setLoading(boolean loading) {
+        if (loading) {
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private class RSSAsyncTask extends AsyncTask<String, Void, List<Item>> {
+
+        @Override
+        protected void onPreExecute() {
+            setLoading(true);
+        }
+
+        @Override
+        protected List<Item> doInBackground(String... params) {
+            ParseRSS saxparser = new ParseRSS(params[0]);
+            return saxparser.parse();
+        }
+
+        @Override
+        protected void onPostExecute(List<Item> items) {
+
+            if(items != null){
+                setLoading(false);
+            }
+
+
+        }
     }
 }
